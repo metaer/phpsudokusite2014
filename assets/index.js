@@ -127,20 +127,20 @@ function solve_task(){
 
     }).done(function(result) {
         switch_progress_animation('off');
-        if (result.solution){
-            if (result.solution == 'nosolution'){
-                noty({text: "Задача не имеет решения", layout:'topCenter', type: 'information', dismissQueue: true});
-            }
-            else{
-                insert_string_to_field(result.solution);
-                load_colors(result.array81);
-                noty({text: "Задача успешно решена", layout:'topCenter', type: 'success', timeout: 5000, dismissQueue: true});
-            }
-        }
-        else{
-            noty({text: result.error, layout:'topCenter', type: 'error', timeout: 15000, dismissQueue: true});
-            load_colors(result.array81);
-        }
+//        if (result.solution){
+//            if (result.solution == 'nosolution'){
+//                noty({text: "Задача не имеет решения", layout:'topCenter', type: 'information', dismissQueue: true});
+//            }
+//            else{
+//                insert_string_to_field(result.solution);
+//                load_colors(result.array81);
+//                noty({text: "Задача успешно решена", layout:'topCenter', type: 'success', timeout: 5000, dismissQueue: true});
+//            }
+//        }
+//        else{
+//            noty({text: result.error, layout:'topCenter', type: 'error', timeout: 15000, dismissQueue: true});
+//            load_colors(result.array81);
+//        }
     });
 
 
