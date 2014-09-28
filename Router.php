@@ -4,10 +4,11 @@ class Router {
     private static $actionMap = array(
         '' => 'indexAction',
         'about' => 'aboutAction',
-        'feedback' => 'feedbackAction'
+        'feedback' => 'feedbackAction',
+        'ajax' => 'ajaxAction'
     );
 
-    public static function getActionName($route) {
+    public static function getMethodName($route) {
         return self::$actionMap[$route] ?: 'notFoundAction';
     }
 

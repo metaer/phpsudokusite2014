@@ -27,10 +27,10 @@ class Controller {
     public function feedbackAction() {
         $post_message = &$_POST['message'];
         $submitted = !is_null($post_message);
-        $valid = !is_null($post_message) && $post_message !== "";
+        $valid = $submitted && $post_message !== "";
         $message = $valid ? $post_message : null;
         $mailingResult = false;
-        if ($submitted) {
+        if ($valid) {
             $mailingResult = Mail::send($message);
         }
         $answer = "";
@@ -50,6 +50,11 @@ class Controller {
             'active' => 'feedback',
             'answer' => $answer
         ));
+    }
+
+    public function ajaxAction() {
+        $input = isset($_GET['str']) ? $_GET['str'] : "";
+        echo CurlWrapper::getDataFromUrl("http://api.sudoku24.ru/$input");
     }
 
     public function notFoundAction() {

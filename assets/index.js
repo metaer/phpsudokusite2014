@@ -67,10 +67,15 @@ $(function(){
 
 function set_background_small_squares(){
     var indexes = [1,2,3,10,11,12,19,20,21,7,8,9,16,17,18,25,26,27,31,32,33,40,41,42,49,50,51,55,56,57,64,65,66,73,74,75,61,62,63,70,71,72,79,80,81];
-    var color = '#F7F3FA';
-    for (index in indexes){
-        cell(indexes[index]).css('background-color',color);
-        cell(indexes[index]).parent().css('background-color',color);
+    var color;
+    for (var i = 1; i <= 81; i++){
+        if (!in_array(i, indexes, true)) {
+            color = 'white';
+        } else {
+            var color = '#F7F3FA';
+        }
+        cell(i).css('background-color',color);
+        cell(i).parent().css('background-color',color);
     }
 }
 
@@ -93,16 +98,16 @@ function show_hint_about_tab(){
 
 function solve_task(){
 
-    noty({text: "Мы начинаем решать задачу. Максимальное время ожидания: 10 минут", layout:'topCenter', type: 'information', timeout: 4000, dismissQueue: true});
+    noty({text: "Мы начинаем решать задачу. Максимальное время ожидания: 30 секунд", layout:'topCenter', type: 'information', timeout: 4000, dismissQueue: true});
 
     var str = read_field_to_string();
 
     $.ajax({
         type: "GET",
-        url: "/ajax/get_sudoku_solution",
+        url: "/ajax",
         dataType: "json",
         cache:false,
-        timeout: 600000,
+        timeout: 30000,
         async: true,
         data: {str: str},
         error: function(JqXhr, TextStatus, ErrorThrown)
@@ -233,3 +238,18 @@ function revert_visibility_of_insert_button(){
         button.css('visibility','hidden');
 }
 
+function in_array(needle, haystack, strict) {
+    //
+    // +   original by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+
+    var found = false, key, strict = !!strict;
+
+    for (key in haystack) {
+        if ((strict && haystack[key] === needle) || (!strict && haystack[key] == needle)) {
+            found = true;
+            break;
+        }
+    }
+
+    return found;
+}
