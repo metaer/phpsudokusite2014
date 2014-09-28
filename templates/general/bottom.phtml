@@ -1,0 +1,17 @@
+        <div>
+            <br>
+            <br>
+        </div>
+
+        <script src="/assets/public_libs/jQuery/jquery-1.10.2.min.js" type="text/javascript"></script>
+        <script src="/assets/public_libs/bootstrap/js/bootstrap.min.js?1411903324" type="text/javascript"></script>
+        <script src="/assets/public_libs/noty/jquery.noty.js" type="text/javascript"></script>
+        <script src="/assets/public_libs/noty/layouts/topCenter.js?1411903324" type="text/javascript"></script>
+        <script src="/assets/public_libs/noty/themes/default.js" type="text/javascript"></script>
+
+        <? foreach ($this->js as $val): ?>
+            <script src="<?=$val?>" type="text/javascript"></script>
+        <? endforeach ?>
+
+    </body>
+</html>
