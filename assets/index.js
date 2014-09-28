@@ -141,6 +141,17 @@ function solve_task(){
 //            noty({text: result.error, layout:'topCenter', type: 'error', timeout: 15000, dismissQueue: true});
 //            load_colors(result.array81);
 //        }
+        switch (result.code) {
+            case 1:
+                insert_string_to_field(result.solution);
+                noty({text: "Задача успешно решена", layout:'topCenter', type: 'success', timeout: 5000, dismissQueue: true});
+                break;
+            case 0:
+                noty({text: "Задача не имеет решения", layout:'topCenter', type: 'information', timeout: 5000, dismissQueue: true});
+                break;
+            default :
+                noty({text: (result.message ? result.message : "Ошибка 794"), layout:'topCenter', type: 'error', timeout: 20000, dismissQueue: true});
+        }
     });
 
 
