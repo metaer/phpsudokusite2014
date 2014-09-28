@@ -1,3 +1,16 @@
 <div style="padding-left: 150px; padding-top: 30px">
-    Форма обратной связи
+    <? if ($answer): ?>
+        <b><?=$answer?></b>
+    <? endif ?>
+    <form method="post" action="/feedback">
+        <div style="width: 380px; padding-bottom: 20px">
+            Если Вы обнаружили ошибку и хотели бы пообщаться со мной на тему решения судоку или на какую-либо другую тему - напишите свои контакты в конце сообщения
+        </div>
+
+        Ваше сообщение:<br>
+        <textarea style="width: 400px; height: 100px" name="message"></textarea>
+        <br>
+        <input class="btn btn-primary" type="submit" value="Отправить">
+
+    </form>
 </div>

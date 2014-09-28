@@ -25,9 +25,30 @@ class Controller {
     }
 
     public function feedbackAction() {
+        $post_message = &$_POST['message'];
+        $submitted = !is_null($post_message);
+        $valid = !is_null($post_message) && $post_message !== "";
+        $message = $valid ? $post_message : null;
+        $mailingResult = false;
+        if ($submitted) {
+            $mailingResult = Mail::send($message);
+        }
+        $answer = "";
+        if ($submitted) {
+            if (!$valid) {
+                $answer = "Сообщение не должно быть пустым";
+            } else {
+                if ($mailingResult) {
+                    $answer = "Ваше сообщение успешно отправлено";
+                } else {
+                    $answer = "При отправке сообщения возникла ошибка. Сообщите, пожалуйста, по номеру +79164753944";
+                }
+            }
+        }
         $this->render('feedback.phtml', array(
             'title' => 'Решатель судоку. Обратная связь',
-            'active' => 'feedback'
+            'active' => 'feedback',
+            'answer' => $answer
         ));
     }
 
