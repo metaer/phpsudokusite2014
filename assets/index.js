@@ -1,16 +1,17 @@
 glob__hint_about_tab_showed = false;
+global_timeout = 0;
 
 $(function(){
 
     $('#prog_bar').css('visibility','hidden');
 
-    revert_visibility_of_insert_button();
+//    revert_visibility_of_insert_button();
 
     clear_field();
 
     set_background_small_squares();
 
-    cell(1).trigger('focus');
+//    cell(1).trigger('focus');
 
     $('.sudoku_field input').on('keydown',
         function(e){
@@ -92,14 +93,71 @@ function show_hint_about_tab(){
     if (!glob__hint_about_tab_showed){
         noty({text: "Подсказка: Используйте ПРОБЕЛ, чтобы пропустить ввод цифры; BACKSPACE, чтобы стереть цифру и перейти к предыдущему полю", layout:'topCenter', type: 'alert', timeout: 8850, dismissQueue: true});
         glob__hint_about_tab_showed = true;
-        revert_visibility_of_insert_button();
+//        revert_visibility_of_insert_button();
     }
 }
 
+function make_array81_in_success_case(str) {
+    var arr = {};
+    for (var index in str) {
+        if (str[index] !== ".") {
+            arr[parseInt(index)+1] = 'initial';
+        } else {
+            arr[parseInt(index)+1] = 'solution';
+        }
+    }
+    return arr;
+}
+function make_array81_in_wrong_sudoku_condition_case(subtype, number) {
+    var array81 = {};
+
+    function get_top_left_index_by_small_square_number(number) {
+        var conformity =  {1: 1, 2: 4, 3: 7, 4: 28, 5: 31, 6: 34, 7: 55, 8: 58, 9: 61};
+        return conformity[number];
+    }
+
+    switch (subtype) {
+        case 'alreadysolved':
+            for (var i=1; i<=81; i++) {
+                array81[i] = 'error';
+            }
+            return array81;
+        case 'repeat_in_col':
+            for (var i = number; i != 81+number ; i+=9) {
+                array81[i] = 'error';
+            }
+            break;
+        case 'repeat_in_row':
+            for (var i = number*9-8; i <= number*9; i++) {
+                array81[i] = 'error';
+            }
+            break;
+        case 'repeat_in_square':
+            var indexes = [];
+            var top_left_index = get_top_left_index_by_small_square_number(number);
+            for (var i = top_left_index; i<=top_left_index + 2; i++){
+                for (var j = i; j != 27 + i; j+=9){
+                    indexes.push(j);
+                }
+            }
+            var index;
+            for (var currentCycleIndex in indexes) {
+                index = indexes[currentCycleIndex];
+                array81[index] = 'error';
+            }
+        }
+    //Установим остальные в initial
+    for (i = 1; i<=81; i++) {
+        if (typeof array81[i] === "undefined") {
+            array81[i] = 'initial';
+        }
+    }
+    return array81;
+}
+
 function solve_task(){
-
-    noty({text: "Мы начинаем решать задачу. Максимальное время ожидания: 30 секунд", layout:'topCenter', type: 'information', timeout: 4000, dismissQueue: true});
-
+    global_timeout = 30000;
+    noty({text: "Мы начинаем решать задачу. Максимальное время ожидания: " + (global_timeout/1000) + " секунд", layout:'topCenter', type: 'information', timeout: 4000, dismissQueue: true});
     var str = read_field_to_string();
 
     $.ajax({
@@ -107,7 +165,7 @@ function solve_task(){
         url: "/ajax",
         dataType: "json",
         cache:false,
-        timeout: 30000,
+        timeout: global_timeout,
         async: true,
         data: {str: str},
         error: function(JqXhr, TextStatus, ErrorThrown)
@@ -118,7 +176,7 @@ function solve_task(){
                 noty({text: 'Ошибка на сервере: 500. Сообщите, пожалуйста, через форму обратной связи.', layout:'topCenter', type: 'error', timeout: 14000, dismissQueue: true});
             }
             else if(TextStatus == 'timeout'){
-                noty({text: 'timeout error. Сообщите, пожалуйста, через форму обратной связи начальные условия этой задачи. Спасибо', layout:'topCenter', type: 'error', timeout: 16000, dismissQueue: true});
+                noty({text: 'Ошибка: timeout error. Сообщите, пожалуйста, через форму обратной связи начальные условия этой задачи. Спасибо', layout:'topCenter', type: 'error', timeout: 16000, dismissQueue: true});
             }
             else {
                 noty({text: 'Ошибка на сервере. Сообщите, пожалуйста, об ошибке через форму обратной связи', layout:'topCenter', type: 'error', timeout: 14000, dismissQueue: true});
@@ -127,29 +185,23 @@ function solve_task(){
 
     }).done(function(result) {
         switch_progress_animation('off');
-//        if (result.solution){
-//            if (result.solution == 'nosolution'){
-//                noty({text: "Задача не имеет решения", layout:'topCenter', type: 'information', dismissQueue: true});
-//            }
-//            else{
-//                insert_string_to_field(result.solution);
-//                load_colors(result.array81);
-//                noty({text: "Задача успешно решена", layout:'topCenter', type: 'success', timeout: 5000, dismissQueue: true});
-//            }
-//        }
-//        else{
-//            noty({text: result.error, layout:'topCenter', type: 'error', timeout: 15000, dismissQueue: true});
-//            load_colors(result.array81);
-//        }
         switch (result.code) {
             case 1:
                 insert_string_to_field(result.solution);
+                var array81 = make_array81_in_success_case(str);
+                load_colors(array81);
                 noty({text: "Задача успешно решена", layout:'topCenter', type: 'success', timeout: 5000, dismissQueue: true});
                 break;
             case 0:
                 noty({text: "Задача не имеет решения", layout:'topCenter', type: 'information', timeout: 5000, dismissQueue: true});
                 break;
             default :
+                if (result.code == -1) {
+                    if (typeof result.extra !== "undefined") {
+                        var array81 = make_array81_in_wrong_sudoku_condition_case(result.extra.subtype, result.extra.number);
+                        load_colors(array81);
+                    }
+                }
                 noty({text: (result.message ? result.message : "Ошибка 794"), layout:'topCenter', type: 'error', timeout: 20000, dismissQueue: true});
         }
     });
